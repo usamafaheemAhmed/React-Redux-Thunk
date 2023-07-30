@@ -1,23 +1,23 @@
-import logo from './logo.svg';
+
 import './App.css';
+import Counter from './store/slices/Counter';
+import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import BodyComponent from './Components/BodyComponent';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import ReduxLearning from './Components/ReduxLearning/ReduxLearning';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="App-header">
+        <Counter />    
+        <BrowserRouter>
+        <Routes>
+        <Route path="/" element={<BodyComponent />} />
+        <Route path="/form" element={<ReduxLearning />} />
+        </Routes>
+      </BrowserRouter>
+      </div>
     </div>
   );
 }

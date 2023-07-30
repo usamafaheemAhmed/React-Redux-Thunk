@@ -1,0 +1,128 @@
+import { createSlice, nanoid, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+
+let initialState = {
+    Posts: [],
+    Status: "idle",
+    Error: null,
+}
+
+const API = "http://localhost:3000/Redux";
+
+
+export const fetchPosts = createAsyncThunk("Redux/thunk/Api", async () => {
+    try {
+        let res = await axios.get(API)
+        // console.log("Api Response=" + res);
+        return [...res.data];
+    }
+    catch (err) {
+        return err.message;
+    }
+})
+
+export const PostData = createAsyncThunk("Redux/thunk/Api", async (initialPost) => {
+    try {
+        let res = await axios.post(API, initialPost);
+        // console.log("Api Response=" + res);
+        return res.data
+    }
+    catch (err) {
+        return err.message;
+    }
+})
+
+let formSlice = createSlice({
+    name: "Counter",
+    initialState,
+    reducers: {
+        addData: {
+            reducer (state, action){
+            state.Posts.push(action.payload);
+            },
+            prepare(Name, FatherName, date, gender) {
+                return {
+                    payload: {
+                        id: nanoid(),
+                        Name,
+                        FatherName,
+                        date,
+                        gender,
+                    }
+                } 
+            }
+            
+        },
+        deleteData: (state, action) => {
+            const index = action.payload;
+            return state.Posts.filter((item, i) => i !== index);
+        },
+        updateData: (state, action) => {
+            // alert(1);
+            const { id, Name, FatherName, date, gender } = action.payload;
+            const index = state.Posts.findIndex(item => item.id === id);
+      
+            if (index !== -1) {
+              // If the item exists in the state, update its properties
+              state[index].Name = Name;
+              state[index].FatherName = FatherName;
+              state[index].date = date;
+              state[index].gender = gender;
+            }
+
+            return state;
+        },
+        AddAttributeData: {
+            reducer (state, action){
+                let { id, Flag } = action.payload;
+                const index = state.Posts.findIndex(item => item.id === id);
+                if (index !== -1) {
+                    // If the item exists in the state, update its properties
+                    state[index].Flag = Flag;
+                }
+            return state;
+                
+            },
+            prepare( Flag, id ) {
+                return {
+                    payload: {
+                        id,
+                        Flag
+                    }
+                } 
+            }
+            
+        },
+    },
+    extraReducers(builder) {
+        builder 
+            .addCase(fetchPosts.pending, (state, action) => {
+                state.Status = 'loading'
+            })
+            .addCase(fetchPosts.fulfilled, (state, action) => {
+                state.Status = 'succeeded'
+                const loadedPosts = action.payload
+                state.Posts = state.Posts.concat(loadedPosts)
+            })
+            .addCase(fetchPosts.rejected, (state, action) => {
+                state.Status = 'failed'
+                state.Error = action.error.message
+            })
+            .addCase(PostData.fulfilled, (state, action) => {
+                console.warning("PostData.fulfilled" + action.payload);
+                state.Posts.push(action.payload)
+            })
+    }
+});
+
+// export const { addData } = formSlice.actions;
+
+export const SelectAllFrom = (state) => state.formData.Posts;
+export const getPostStatus = (state) => state.formData.Status;
+export const StateErrors = (state) => state.formData.Error;
+
+
+
+export const { addData, deleteData, updateData, AddAttributeData } = formSlice.actions;
+
+export default formSlice.reducer ;
