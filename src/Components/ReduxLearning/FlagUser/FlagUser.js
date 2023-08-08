@@ -3,7 +3,7 @@ import flag_Yellow from "./Flag (1).svg";
 import flag_Green from "./Flag (2).svg";
 import flag_Red from "./Flag (3).svg";
 import { useDispatch, useSelector } from 'react-redux'
-import { AddAttributeData } from "../../../store/slices/fromSlice/fromSlice";
+import { AddAttributeData , UpdateFlagAxiosData } from "../../../store/slices/fromSlice/fromSlice";
 
 
 const FlagUser = (props) => {
@@ -11,7 +11,12 @@ const FlagUser = (props) => {
   let Dispatch = useDispatch();
 
   let Flag = (num) => {
-    Dispatch(AddAttributeData(num,props.id))
+    let DataId = {
+      id: props.id,
+      Flag:num
+    }
+    Dispatch(UpdateFlagAxiosData(DataId))
+    console.log(DataId);
   }
 
 

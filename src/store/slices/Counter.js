@@ -7,7 +7,7 @@ const Counter = () => {
     let count = useSelector((state) => state.counter.count);
     let Dispatch = useDispatch();
   return (
-    <div className='row Top '>
+    <div className='row Top px-0 pb-0 m-0'>
           
           <div className='col-md-6 d-none'>
           <button className='btn btn-danger float-end  mx-2' onClick={()=>Dispatch(decrement())}>Sub -</button>

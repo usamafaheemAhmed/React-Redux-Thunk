@@ -5,7 +5,7 @@ import "./ReduxLearning.css";
 import { useDispatch, useSelector } from 'react-redux'
 // import { addData } from "../../store/slices/fromSlice/fromSlice";
 import { SelectAllFrom, getPostStatus, StateErrors, fetchPosts } from "../../store/slices/fromSlice/fromSlice";
-import { addData, deleteData, updateData, PostData } from "../../store/slices/fromSlice/fromSlice";
+import { addData, deleteData, updateData, PostData, DeleteDataAxios, UpdateAxiosData } from "../../store/slices/fromSlice/fromSlice";
 import Dropdown from 'react-bootstrap/Dropdown';
 import DropdownButton from 'react-bootstrap/DropdownButton';
 import FlagUser from "./FlagUser/FlagUser";
@@ -18,6 +18,7 @@ import flag_Red from "./FlagUser/Flag (3).svg";
 const ReduxLearning = () => {
 
   let [updateFlag, SetUpdateFlag] = useState(false);
+  let [AddRequest, setAddRequest] = useState("idle");
 
   let PreviousData = useSelector(SelectAllFrom);
   let Dispatch = useDispatch();
@@ -34,7 +35,7 @@ const ReduxLearning = () => {
         Dispatch(fetchPosts())
       }
     }
-    console.log(PreviousData)
+    // console.log(PreviousData)
     useOne++
   }, [PostStatus, Dispatch])
   
@@ -66,16 +67,23 @@ const ReduxLearning = () => {
     };
 
     if (updateFlag) {
-      Dispatch(updateData(data)); // this is for the Slice which does not have Payload prepare
+      // await Dispatch(updateData(data)); // this is for the Slice which does not have Payload prepare //withOut thunk
+      Dispatch(UpdateAxiosData(data)); 
       SetUpdateFlag(false);
     }
     else {
-      Dispatch(addData(values.Name,values.FatherName,values.date,values.gender,)); // this is for the the Slice which has Payload Prepare
+      // Dispatch(addData(values.Name, values.FatherName, values.date, values.gender,)); //withOut thunk
+      Dispatch(PostData(data)); // this is for the the Slice which has Payload Prepare
     }    
     resetForm();
   };
 
-  let deleteFunction = (elem,index) => {Dispatch(deleteData(--index));
+  let deleteFunction = (elem, index) => {
+    // Dispatch(deleteData(--index));  //withOut thunk
+    Dispatch(DeleteDataAxios(elem.id));
+    setTimeout(() => {
+      Dispatch(fetchPosts())
+    }, 300);
   }
 
   return (

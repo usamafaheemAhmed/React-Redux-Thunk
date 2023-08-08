@@ -6,8 +6,8 @@ let initialState = {
     Status: "idle",
     Error: null,
 }
-
 const API = "http://localhost:3000/Redux";
+
 
 
 export const fetchPosts = createAsyncThunk("Redux/thunk/Api", async () => {
@@ -21,9 +21,16 @@ export const fetchPosts = createAsyncThunk("Redux/thunk/Api", async () => {
     }
 })
 
-export const PostData = createAsyncThunk("Redux/thunk/Api", async (initialPost) => {
+export const PostData = createAsyncThunk("Redux/postData", async (initialPost) => {
     try {
-        let res = await axios.post(API, initialPost);
+        let data = {
+            id: nanoid(),
+            Name:initialPost.Name,
+            FatherName:initialPost.FatherName,
+            date:initialPost.date,
+            gender:initialPost.gender,
+        }
+        let res = await axios.post(API, data);
         // console.log("Api Response=" + res);
         return res.data
     }
@@ -31,6 +38,35 @@ export const PostData = createAsyncThunk("Redux/thunk/Api", async (initialPost) 
         return err.message;
     }
 })
+
+export const UpdateAxiosData  = createAsyncThunk("Redux/UpdateAxiosData", async (initialPost) => {
+    try {
+        const res = await axios.patch(`${API}/${initialPost.id}`, initialPost);
+        return res.data;
+    } catch (err) {
+        throw err;
+    }
+})
+
+export const DeleteDataAxios = createAsyncThunk("Redux/deleteDataAxios", async (postId) => {
+    try {
+      const res = await axios.delete(`${API}/${postId}`);
+      return res.data;
+    } catch (err) {
+      throw err;
+    }
+});
+  
+export const UpdateFlagAxiosData = createAsyncThunk("Redux/UpdateFlagAxiosData", async (data) => {
+    try {
+        // console.log(data);
+        const res = await axios.patch(`${API}/${data.id}`, {Flag:data.Flag} );
+        let { id, Flag } = data;
+        return { id, Flag };
+    } catch (err) {
+        throw err;
+    }
+});
 
 let formSlice = createSlice({
     name: "Counter",
@@ -76,6 +112,7 @@ let formSlice = createSlice({
             reducer (state, action){
                 let { id, Flag } = action.payload;
                 const index = state.Posts.findIndex(item => item.id === id);
+                alert(index);
                 if (index !== -1) {
                     // If the item exists in the state, update its properties
                     state[index].Flag = Flag;
@@ -109,8 +146,46 @@ let formSlice = createSlice({
                 state.Error = action.error.message
             })
             .addCase(PostData.fulfilled, (state, action) => {
-                console.warning("PostData.fulfilled" + action.payload);
-                state.Posts.push(action.payload)
+                // console.warning("PostData.fulfilled" + action.payload);
+                state.Posts.push(action.payload);
+            })
+            //Delete
+            .addCase(DeleteDataAxios.pending, (state, action) => {
+                // state.Posts = action.payload;
+                state.Status = 'loading'
+            })
+            .addCase(DeleteDataAxios.fulfilled, (state, action) => {
+                state.Posts = [];
+                state.Status = 'succeeded'
+            })
+            .addCase(DeleteDataAxios.rejected, (state, action) => {
+                // state.Posts = action.payload;
+                state.Status = 'succeeded'
+            })
+            //Update
+            .addCase(UpdateAxiosData.pending, (state, action) => {
+                state.Status = 'loading';
+            })
+            .addCase(UpdateAxiosData.fulfilled, (state, action) => {
+                state.Status = 'succeeded';
+                // Update the state to reflect the changes made by the update
+                const updatedPost = action.payload;
+                const index = state.Posts.findIndex(post => post.id === updatedPost.id);
+                if (index !== -1) {
+                    state.Posts[index] = updatedPost;
+                }
+            })
+            .addCase(UpdateAxiosData.rejected, (state, action) => {
+                state.Status = 'failed';
+                state.Error = action.error.message;
+            })
+            //adding Flag
+            .addCase(UpdateFlagAxiosData.fulfilled, (state, action) => {
+                const { id, Flag } = action.payload;
+                const index = state.Posts.findIndex(item => item.id === id);
+                if (index !== -1) {
+                    state.Posts[index].Flag = Flag;
+                }
             })
     }
 });
