@@ -16,11 +16,11 @@ function App() {
         <Counter />    
         <BrowserRouter>
         <Routes>
-        <Route path="/" element={<LoginForm />} />
+        <Route path="/LoginForm" element={<LoginForm />} />
         <Route path="/counter" element={<BodyComponent />} />
         <Route path="/form" element={<ReduxLearning />} />
         <Route path="/HoldData" element={<HoldData />} />
-        <Route path="/Task" element={<CSVTask />} />
+        <Route path="/" element={<CSVTask />} />
         </Routes>
       </BrowserRouter>
       </div>
