@@ -12,8 +12,8 @@ import CSVTask from './Components/CSVTask/CSVTask';
 function App() {
   return (
     <div className="App">
-      <div className="App-header">
-        <Counter />    
+      <div className="App-header pt-5 ">
+        {/*<Counter />*/}   
         <BrowserRouter>
         <Routes>
         <Route path="/LoginForm" element={<LoginForm />} />
